@@ -9,6 +9,11 @@ app.use(cors()); // Enable CORS for frontend connections
 app.set('trust proxy', true); // Enable proxy support in Express
 // app.use(express.static('public')); // Serve HTML client
 
+// ✅ Handle unknown routes (404 JSON response)
+app.use((req, res) => {
+    res.status(404).json({ error: "Requested page not found!" });
+});
+
 app.get('/events', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
