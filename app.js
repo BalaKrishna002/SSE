@@ -48,7 +48,7 @@ app.get('/events', (req, res) => {
   //     }
   // };
 
-  const interval = setInterval(sendData, 0);
+  const interval = setInterval(sendData, 500);
   // const heartbeat = setInterval(sendHeartbeat, 10000); // Every 10 seconds
 
   req.on('close', () => {
