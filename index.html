@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE Aircraft Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #data { white-space: pre-wrap; background: #f4f4f4; padding: 10px; border: 1px solid #ddd; display: inline-block; }
+    </style>
+</head>
+<body>
+    <h1>Real-time Aircraft Data</h1>
+    <div id="data">Waiting for data...</div>
+
+    <script>
+        let eventSource;
+
+        function connectSSE() {
+            eventSource = new EventSource('http://localhost:3000/events');
+
+            eventSource.onmessage = (event) => {
+                const aircraftData = JSON.parse(event.data);
+                document.getElementById('data').textContent = JSON.stringify(aircraftData, null, 2);
+            };
+
+            eventSource.onerror = () => {
+                console.warn("Connection lost, retrying...");
+                eventSource.close();
+                setTimeout(connectSSE, 3000); // Retry after 3 seconds
+            };
+        }
+
+        connectSSE();
+    </script>
+</body>
+</html>
