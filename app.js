@@ -3,10 +3,10 @@ const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT||3000;
-
 let clientCount = 0; // Track connected clients
 
 app.use(cors()); // Enable CORS for frontend connections
+app.set('trust proxy', true); // Enable proxy support in Express
 // app.use(express.static('public')); // Serve HTML client
 
 app.get('/events', (req, res) => {
@@ -14,8 +14,12 @@ app.get('/events', (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    clientCount++; // Increment count when a client connects
-    console.log(`Client connected. Total clients: ${clientCount}`);
+    // Get client IP address
+    let clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    if (clientIp === '::1') clientIp = '127.0.0.1'; // Convert IPv6 localhost to IPv4
+
+    clientCount++; // Increment client count
+    console.log(`Client connected from ${clientIp}. Total clients: ${clientCount}`);
 
     const sendData = () => {
         const aircraftData = {
@@ -30,11 +34,11 @@ app.get('/events', (req, res) => {
         res.write(`data: ${JSON.stringify(aircraftData)}\n\n`);
     };
 
-    const interval = setInterval(sendData, 500);
+    const interval = setInterval(sendData, 2000);
 
     req.on('close', () => {
-        clientCount--; // Decrement count when a client disconnects
-        console.log(`Client disconnected. Total clients: ${clientCount}`);
+        clientCount--; // Decrement count when client disconnects
+        console.log(`Client disconnected from ${clientIp}. Total clients: ${clientCount}`);
         clearInterval(interval);
     });
 });
