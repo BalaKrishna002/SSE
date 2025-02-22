@@ -34,7 +34,7 @@ app.get('/events', (req, res) => {
         res.write(`data: ${JSON.stringify(aircraftData)}\n\n`);
     };
 
-    const interval = setInterval(sendData, 2000);
+    const interval = setInterval(sendData, 1000);
 
     req.on('close', () => {
         clientCount--; // Decrement count when client disconnects
